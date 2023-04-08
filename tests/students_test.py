@@ -71,3 +71,32 @@ def test_assingment_resubmitt_error(client, h_student_1):
     assert response.status_code == 400
     assert error_response['error'] == 'FyleError'
     assert error_response["message"] == 'only a draft assignment can be submitted'
+
+def test_submit_different_student_assignment(client,h_student_1):
+    response = client.post(
+        '/student/assignments/submit',
+        headers=h_student_1,
+        json={
+            'id': 3,
+            'teacher_id': 2
+        })
+    
+    error_response=response.json
+    assert response.status_code == 400
+    assert error_response['error'] == 'FyleError'
+    assert error_response["message"] == 'This assignment belongs to some other student'
+
+
+def test_update_assignment(client,h_student_1):
+    response = client.post(
+        '/student/assignments',
+        headers=h_student_1,
+        json={
+            'id': 6,
+            "content": "some updated text"
+        })
+    
+    assert response.status_code == 200
+    data = response.json['data']
+    assert data['id'] == 6
+    assert data['content'] == "some updated text"
